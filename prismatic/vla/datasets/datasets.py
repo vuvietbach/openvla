@@ -135,7 +135,6 @@ class RLDSDataset(IterableDataset):
                 ],
             )}),
         # fmt: on
-
         # Initialize RLDS Dataset
         self.dataset, self.dataset_length, self.dataset_statistics = self.make_dataset(rlds_config)
 

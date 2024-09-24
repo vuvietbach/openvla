@@ -106,6 +106,15 @@ class Exp_DinoSigLIP_224px_Bridge(Exp_SigLIP_224px_Bridge):
     base_vlm: Union[str, Path] = "prism-dinosiglip-224px+7b"
 
     data_mix: str = "bridge"
+    
+@dataclass
+class Exp_DinoSigLIP_224px_NYU(Exp_SigLIP_224px_Bridge):
+    vla_id: str = "mamba"
+    base_vlm: Union[str, Path] = "prism-dinosiglip-224px+7b"
+    data_mix: str = 'nyu_franka_play_dataset_converted_externally_to_rlds'
+    expected_world_size: int = 3
+    global_batch_size: int = 15
+    per_device_batch_size: int = 1
 
 
 # = [64 GPU] SigLIP 224px + OXE Magic Soup =
@@ -224,6 +233,9 @@ class VLARegistry(Enum):
 
     # === DROID Fine-tuning Configs ===
     SIGLIP_224PX_MX_DROID_WIPE = Exp_SigLIP_224px_Droid_Wipe
+    
+    # === NYU Franka Play Dataset ===
+    MAMBA = Exp_DinoSigLIP_224px_NYU
 
     @property
     def vla_id(self) -> str:

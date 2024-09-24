@@ -5,7 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
-
+data
+checkpoints
+mamba-minimal/
+tmp
 # Distribution / packaging
 .Python
 build/

@@ -50,6 +50,7 @@ def get_model_description(model_id_or_name: str) -> str:
 
 # === Load Pretrained Model ===
 def load(
+    cfg, 
     model_id_or_path: Union[str, Path],
     hf_token: Optional[str] = None,
     cache_dir: Optional[Union[str, Path]] = None,
@@ -68,11 +69,18 @@ def load(
             raise ValueError(f"Couldn't find `{model_id_or_path = }; check `prismatic.available_model_names()`")
 
         overwatch.info(f"Downloading `{(model_id := GLOBAL_REGISTRY[model_id_or_path]['model_id'])} from HF Hub")
-        with overwatch.local_zero_first():
-            config_json = hf_hub_download(repo_id=HF_HUB_REPO, filename=f"{model_id}/config.json", cache_dir=cache_dir)
-            checkpoint_pt = hf_hub_download(
-                repo_id=HF_HUB_REPO, filename=f"{model_id}/checkpoints/latest-checkpoint.pt", cache_dir=cache_dir
-            )
+        success = False
+        while not success:
+            print("yo")
+            try:
+                with overwatch.local_zero_first():
+                    config_json = hf_hub_download(repo_id=HF_HUB_REPO, filename=f"{model_id}/config.json", cache_dir=cache_dir)
+                    checkpoint_pt = hf_hub_download(
+                        repo_id=HF_HUB_REPO, filename=f"{model_id}/checkpoints/latest-checkpoint.pt", cache_dir=cache_dir
+                    )
+                success = True
+            except Exception as e:
+                pass
 
     # Load Model Config from `config.json`
     with open(config_json, "r") as f:
@@ -87,21 +95,26 @@ def load(
         f"             Arch Specifier  =>> [bold]{model_cfg['arch_specifier']}[/]\n"
         f"             Checkpoint Path =>> [underline]`{checkpoint_pt}`[/]"
     )
-
-    # Load Vision Backbone
-    overwatch.info(f"Loading Vision Backbone [bold]{model_cfg['vision_backbone_id']}[/]")
-    vision_backbone, image_transform = get_vision_backbone_and_transform(
-        model_cfg["vision_backbone_id"],
-        model_cfg["image_resize_strategy"],
-    )
-
     # Load LLM Backbone --> note `inference_mode = True` by default when calling `load()`
+    if hasattr(cfg, 'use_mamba') and cfg.use_mamba:
+        model_cfg['llm_backbone_id'] = 'mamba-codestral-7b'
+        # from transformers import Mamba2ForCausalLM
+        # model_id = 'mistralai/Mamba-Codestral-7B-v0.1'
+        # model = Mamba2ForCausalLM.from_pretrained(model_id, revision='refs/pr/9')
+    
     overwatch.info(f"Loading Pretrained LLM [bold]{model_cfg['llm_backbone_id']}[/] via HF Transformers")
     llm_backbone, tokenizer = get_llm_backbone_and_tokenizer(
         model_cfg["llm_backbone_id"],
         llm_max_length=model_cfg.get("llm_max_length", 2048),
         hf_token=hf_token,
         inference_mode=not load_for_training,
+    )
+
+    # Load Vision Backbone
+    overwatch.info(f"Loading Vision Backbone [bold]{model_cfg['vision_backbone_id']}[/]")
+    vision_backbone, image_transform = get_vision_backbone_and_transform(
+        model_cfg["vision_backbone_id"],
+        model_cfg["image_resize_strategy"],
     )
 
     # Load VLM using `from_pretrained` (clobbers HF syntax... eventually should reconcile)
@@ -113,6 +126,7 @@ def load(
         llm_backbone,
         arch_specifier=model_cfg["arch_specifier"],
         freeze_weights=not load_for_training,
+        llm_backbone_id=model_cfg["llm_backbone_id"],        
     )
 
     return vlm

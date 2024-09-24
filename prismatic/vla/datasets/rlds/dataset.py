@@ -130,6 +130,7 @@ def make_dataset_from_rlds(
 
     def restructure(traj):
         # apply a standardization function, if provided
+        # import pdb; pdb.set_trace()
         if standardize_fn is not None:
             traj = standardize_fn(traj)
 
@@ -199,8 +200,8 @@ def make_dataset_from_rlds(
 
         return traj
 
+    # import pdb; pdb.set_trace()
     builder = tfds.builder(name, data_dir=data_dir)
-
     # load or compute dataset statistics
     if isinstance(dataset_statistics, str):
         with tf.io.gfile.GFile(dataset_statistics, "r") as f:

@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 
 from transformers import PreTrainedTokenizerBase
 
-from prismatic.models.backbones.llm import LLaMa2LLMBackbone, LLMBackbone, MistralLLMBackbone, PhiLLMBackbone
+from prismatic.models.backbones.llm import LLaMa2LLMBackbone, LLMBackbone, MistralLLMBackbone, PhiLLMBackbone, MambaLLMBackbone
 from prismatic.models.backbones.vision import (
     CLIPViTBackbone,
     DinoCLIPViTBackbone,
@@ -70,6 +70,9 @@ LLM_BACKBONES = {
 
     # === Phi-2 Backbone ===
     "phi-2-3b": {"cls": PhiLLMBackbone, "kwargs": {}},
+    
+    # === Mamba Backbone ===
+    "mamba-codestral-7b": {"cls": MambaLLMBackbone, "kwargs": {}},
 }
 
 # fmt: on
@@ -97,6 +100,7 @@ def get_llm_backbone_and_tokenizer(
     hf_token: Optional[str] = None,
     inference_mode: bool = False,
 ) -> Tuple[LLMBackbone, PreTrainedTokenizerBase]:
+    
     if llm_backbone_id in LLM_BACKBONES:
         llm_cfg = LLM_BACKBONES[llm_backbone_id]
         llm_backbone: LLMBackbone = llm_cfg["cls"](

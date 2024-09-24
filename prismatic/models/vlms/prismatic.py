@@ -111,7 +111,9 @@ class PrismaticVLM(VLM):
         ), "PrismaticVLM `from_pretrained` expects checkpoint with keys for `projector` AND `llm_backbone`!"
 
         vlm.projector.load_state_dict(model_state_dict["projector"])
-        vlm.llm_backbone.load_state_dict(model_state_dict["llm_backbone"])
+        if 'llm_backbone_id' not in kwargs or kwargs['llm_backbone_id'] != 'mamba-codestral-7b':
+            vlm.llm_backbone.load_state_dict(model_state_dict["llm_backbone"])
+        
         if "vision_backbone" in model_state_dict.keys():
             vlm.vision_backbone.load_state_dict(model_state_dict["vision_backbone"])
 
