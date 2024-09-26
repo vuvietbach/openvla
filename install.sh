@@ -16,3 +16,5 @@ ninja --version; echo $?  # Verify Ninja --> should return exit code "0"
 pip install "flash-attn==2.5.5" --no-build-isolation
 
 TORCH_USE_CUDA_DSA
+pip install transformers
+pip install dracus

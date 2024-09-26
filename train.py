@@ -95,9 +95,9 @@ class TrainConfig:
         self.train_strategy = self.vla.train_strategy
 
         # [Validate] Assert on `expected_world_size`
-        assert (
-            self.vla.expected_world_size == overwatch.world_size()
-        ), f"Expected World Size = {self.vla.expected_world_size} but Found {overwatch.world_size()} GPUs!"
+        # assert (
+        #     self.vla.expected_world_size == overwatch.world_size()
+        # ), f"Expected World Size = {self.vla.expected_world_size} but Found {overwatch.world_size()} GPUs!"
 
     # fmt: on
     

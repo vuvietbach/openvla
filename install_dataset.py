@@ -8,4 +8,6 @@ DOWNLOAD_DIR = 'tmp'
 
 print(f"Downloading {len(DATASET_NAMES)} datasets to {DOWNLOAD_DIR}.")
 for dataset_name in tqdm.tqdm(DATASET_NAMES):
-  _ = tfds.load(dataset_name, data_dir=DOWNLOAD_DIR)
+  builder = tfds.builder(dataset_name, data_dir=DOWNLOAD_DIR)
+  builder.download_and_prepare()
+  # _ = tfds.load(dataset_name, data_dir=DOWNLOAD_DIR)

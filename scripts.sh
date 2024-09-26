@@ -73,13 +73,13 @@ python train.py \
   --data_root_dir tmp \
   --run_root_dir runs
 
-WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 2 train.py \
+WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 1 train.py \
   --vla.type "mamba" \
   --data_root_dir tmp \
   --run_root_dir runs \
   --use_mamba True
 
- python train.py \
+WANDB_MODE=disable python train.py \
   --vla.type "mamba" \
   --data_root_dir tmp \
   --run_root_dir runs \
@@ -95,3 +95,15 @@ rm -rf models--nguyenvulebinh--envibert \
 
       --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
+
+/home/user01/miniconda3/envs/ot/bin/pip install tfds-nightly
+/home/user01/miniconda3/envs/ot/bin/pip install apache-beam
+/home/user01/miniconda3/envs/ot/bin/pip install tensorflow
+/home/user01/miniconda3/envs/ot/bin/pip install draccus
+/home/user01/miniconda3/envs/ot/bin/pip install git+https://github.com/moojink/dlimp_openvla#egg=dlimp
+/home/user01/miniconda3/envs/ot/bin/pip install tensorflow_graphics
+/home/user01/miniconda3/envs/ot/bin/pip install jsonlines
+/home/user01/miniconda3/envs/ot/bin/pip install gsutil
+
+# Change directory to your base datasets folder
+cd data ; wget -r -nH --cut-dirs=4 --reject="index.html*" https://rail.eecs.berkeley.edu/datasets/bridge_release/data/tfds/bridge_dataset/ ; mv bridge_dataset bridge_orig

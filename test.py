@@ -14,16 +14,19 @@ from transformers import Mamba2Config, Mamba2ForCausalLM, AutoTokenizer
 import torch
 from huggingface_hub import login
 
-HF_TOKEN = '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'
-login(HF_TOKEN)
-model_id = 'mistralai/Mamba-Codestral-7B-v0.1'
-tokenizer = AutoTokenizer.from_pretrained(model_id, revision='refs/pr/9', from_slow=True, legacy=False)
-model = Mamba2ForCausalLM.from_pretrained(model_id, revision='refs/pr/9')
-import pdb; pdb.set_trace()
-tokenizer.add_special_tokens({"pad_token": "<PAD>"})
-print(tokenizer.pad_token_id)
-print(tokenizer.pad_token)
-print(model.config)
+# check if cuda is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+# HF_TOKEN = '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'
+# login(HF_TOKEN)
+# model_id = 'mistralai/Mamba-Codestral-7B-v0.1'
+# tokenizer = AutoTokenizer.from_pretrained(model_id, revision='refs/pr/9', from_slow=True, legacy=False)
+# model = Mamba2ForCausalLM.from_pretrained(model_id, revision='refs/pr/9')
+# import pdb; pdb.set_trace()
+# tokenizer.add_special_tokens({"pad_token": "<PAD>"})
+# print(tokenizer.pad_token_id)
+# print(tokenizer.pad_token)
+# print(model.config)
 # tokenizer = model.tokenizer
 # input_ids = tokenizer("Hey how are you doing?", return_tensors= "pt")["input_ids"]
 

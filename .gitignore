@@ -2,12 +2,15 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+env.txt
+data
 # C extensions
 *.so
 data
 checkpoints
 mamba-minimal/
+slurm_output
+pretrained/*
 tmp
 # Distribution / packaging
 .Python
