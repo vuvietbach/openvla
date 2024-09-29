@@ -24,6 +24,7 @@ from torch.distributed.fsdp import (
     MixedPrecision,
     ShardingStrategy,
     StateDictType,
+    CPUOffload
 )
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.optim import AdamW
@@ -157,15 +158,21 @@ class FSDPStrategy(TrainingStrategy):
             )
 
         # <FSDP> => note that FSDP will automatically take care of device placement (similar to `autocast`)
+        # import torch.distributed as dist
+        # # custom_group = dist.new_group(ranks=[0])
+        # dist.init_process_group(backend='nccl', rank=0, world_size=1)
+        device_id = overwatch.local_rank()
         self.vlm = FSDP(
             self.vlm,
             auto_wrap_policy=vlm_fsdp_wrapping_policy,
             mixed_precision=fsdp_precision_policy,
             sharding_strategy=self.fsdp_sharding_strategy,
-            device_id=torch.cuda.current_device(),
+            device_id=device_id,
             limit_all_gathers=True,
             use_orig_params=True,
+            cpu_offload=CPUOffload(offload_params=True)
         )
+
 
         # Gradient Checkpoint Setup
         if self.enable_gradient_checkpointing:

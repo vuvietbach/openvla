@@ -104,18 +104,19 @@ class Exp_FreezeVIT_SigLIP_224px_Bridge(Exp_SigLIP_224px_Bridge):
 class Exp_DinoSigLIP_224px_Bridge(Exp_SigLIP_224px_Bridge):
     vla_id: str = "prism-dinosiglip-224px+mx-bridge"
     base_vlm: Union[str, Path] = "prism-dinosiglip-224px+7b"
+    data_mix: str = 'nyu_franka_play_dataset_converted_externally_to_rlds'
+    global_batch_size: int = 2
+    per_device_batch_size: int = 1
 
-    data_mix: str = "bridge"
     
 @dataclass
 class Exp_DinoSigLIP_224px_NYU(Exp_SigLIP_224px_Bridge):
     vla_id: str = "mamba"
     base_vlm: Union[str, Path] = "prism-dinosiglip-224px+7b"
     data_mix: str = 'nyu_franka_play_dataset_converted_externally_to_rlds'
-    expected_world_size: int = 3
-    global_batch_size: int = 15
+    expected_world_size: int = 2
+    global_batch_size: int = 2
     per_device_batch_size: int = 1
-
 
 # = [64 GPU] SigLIP 224px + OXE Magic Soup =
 @dataclass

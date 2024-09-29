@@ -8,8 +8,10 @@ from typing import Optional, Sequence, Type
 
 import torch
 from torch import nn as nn
-from transformers.models.mamba2.modeling_mamba2 import Mamba2Block
-from transformers import Mamba2ForCausalLM
+from transformers.models.mamba2.modeling_mamba2 import Mamba2Model, Mamba2Block
+from transformers.models.mamba.modeling_mamba import MambaModel, MambaBlock
+
+from transformers import Mamba2ForCausalLM, MambaForCausalLM
 
 from prismatic.models.backbones.llm.base_llm import HFCausalLLMBackbone
 from prismatic.models.backbones.llm.prompting import MistralInstructPromptBuilder, PromptBuilder, PurePromptBuilder
@@ -19,6 +21,9 @@ MAMBA_MODELS = {
     # === Pure Meta LLaMa-2 (non-instruct/chat-tuned) Models ===
     "mamba-codestral-7b": {
         "llm_family": "mamba", "llm_cls": Mamba2ForCausalLM, "hf_hub_path": "mistralai/Mamba-Codestral-7B-v0.1"
+    },
+    "mamba": {
+        "llm_family": "mamba", "llm_cls": MambaForCausalLM, "hf_hub_path": "state-spaces/mamba-1.4b-hf"
     },
 }
 # fmt: on
@@ -59,8 +64,12 @@ class MambaLLMBackbone(HFCausalLLMBackbone):
 
     @property
     def transformer_layer_cls(self) -> Type[nn.Module]:
-        return Mamba2Block
-    
+        if self.identifier == "mamba-codestral-7b":
+            return Mamba2Block
+        else:
+            return MambaBlock
+
+
     @property
     def last_layer_finetune_modules(self) -> Sequence[nn.Module]:
         return None

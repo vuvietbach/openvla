@@ -73,15 +73,43 @@ python train.py \
   --data_root_dir tmp \
   --run_root_dir runs
 
-WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 1 train.py \
+WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 2 train.py \
   --vla.type "mamba" \
-  --data_root_dir tmp \
+  --data_root_dir data \
   --run_root_dir runs \
-  --use_mamba True
+  --mamba_backbone_id "mamba-codestral-7b"
+
+WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 2 train.py \
+  --vla.type "prism-dinosiglip-224px+mx-bridge" \
+  --data_root_dir data \
+  --run_root_dir runs 
+
+WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 4 train.py \
+  --vla.type "prism-dinosiglip-224px+mx-bridge" \
+  --data_root_dir data \
+  --run_root_dir runs 
+
+WANDB_MODE=disabled torchrun --standalone --nnodes 1 --nproc-per-node 4 train.py \
+  --vla.type "mamba" \
+  --data_root_dir data \
+  --run_root_dir runs \
+  --mamba_backbone_id "mamba-codestral-7b"
+
+torchrun --standalone --nnodes 1 --nproc-per-node 1 train.py \
+  --vla.type "mamba" \
+  --data_root_dir data \
+  --run_root_dir runs \
+  --mamba_backbone_id "mamba-codestral-7b"
+
+WANDB_MODE=disabled python train.py \
+  --vla.type "mamba" \
+  --data_root_dir data \
+  --run_root_dir runs \
+  --mamba_backbone_id "mamba-codestral-7b"
 
 WANDB_MODE=disable python train.py \
   --vla.type "mamba" \
-  --data_root_dir tmp \
+  --data_root_dir data \
   --run_root_dir runs \
   --use_mamba True
 
@@ -96,14 +124,18 @@ rm -rf models--nguyenvulebinh--envibert \
       --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
 
-/home/user01/miniconda3/envs/ot/bin/pip install tfds-nightly
-/home/user01/miniconda3/envs/ot/bin/pip install apache-beam
-/home/user01/miniconda3/envs/ot/bin/pip install tensorflow
-/home/user01/miniconda3/envs/ot/bin/pip install draccus
-/home/user01/miniconda3/envs/ot/bin/pip install git+https://github.com/moojink/dlimp_openvla#egg=dlimp
-/home/user01/miniconda3/envs/ot/bin/pip install tensorflow_graphics
-/home/user01/miniconda3/envs/ot/bin/pip install jsonlines
-/home/user01/miniconda3/envs/ot/bin/pip install gsutil
-
+pip install tfds-nightly
+pip install apache-beam
+pip install tensorflow
+pip install draccus
+pip install git+https://github.com/moojink/dlimp_openvla#egg=dlimp
+pip install tensorflow_graphics
+pip install jsonlines
+pip install gsutil
+pip install wandb
 # Change directory to your base datasets folder
 cd data ; wget -r -nH --cut-dirs=4 --reject="index.html*" https://rail.eecs.berkeley.edu/datasets/bridge_release/data/tfds/bridge_dataset/ ; mv bridge_dataset bridge_orig
+
+du -h /home/mdxuser/* --max-depth=1 | sort -h
+
+pip install draccu

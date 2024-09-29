@@ -96,8 +96,8 @@ def load(
         f"             Checkpoint Path =>> [underline]`{checkpoint_pt}`[/]"
     )
     # Load LLM Backbone --> note `inference_mode = True` by default when calling `load()`
-    if hasattr(cfg, 'use_mamba') and cfg.use_mamba:
-        model_cfg['llm_backbone_id'] = 'mamba-codestral-7b'
+    if cfg.mamba_backbone_id != None:
+        model_cfg['llm_backbone_id'] = cfg.mamba_backbone_id
         # from transformers import Mamba2ForCausalLM
         # model_id = 'mistralai/Mamba-Codestral-7B-v0.1'
         # model = Mamba2ForCausalLM.from_pretrained(model_id, revision='refs/pr/9')

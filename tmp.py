@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import draccus
+from prismatic.models.backbones.vision.dinosiglip_vit import DinoSigLIPImageTransform
 import torch
 import torch.distributed as dist
 import yaml
@@ -103,18 +104,18 @@ class TrainConfig:
     
     mamba_backbone_id: str = None
 
-# def get_image_transform():
-#     return DinoSigLIPImageTransform(dino_image_transform=Compose(
-#         Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
-#         CenterCrop(size=(224, 224))
-#         ToTensor()
-#         Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
-#     ), siglip_image_transform=Compose(
-#         Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
-#         CenterCrop(size=(224, 224))
-#         ToTensor()
-#         Normalize(mean=tensor([0.5000, 0.5000, 0.5000]), std=tensor([0.5000, 0.5000, 0.5000]))
-#     ), is_prismatic=True)
+def get_image_transform():
+    return DinoSigLIPImageTransform(dino_image_transform=Compose(
+        Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+        CenterCrop(size=(224, 224))
+        ToTensor()
+        Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+    ), siglip_image_transform=Compose(
+        Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+        CenterCrop(size=(224, 224))
+        ToTensor()
+        Normalize(mean=tensor([0.5000, 0.5000, 0.5000]), std=tensor([0.5000, 0.5000, 0.5000]))
+    ), is_prismatic=True)
 
 @draccus.wrap()
 def train(cfg: TrainConfig) -> None:
@@ -221,65 +222,15 @@ def train(cfg: TrainConfig) -> None:
         shuffle_buffer_size=cfg.vla.shuffle_buffer_size,
         image_aug=cfg.image_aug,
     )
-    # Save dataset statistics for de-normalization at inference time
-    if overwatch.is_rank_zero():
-        save_dataset_statistics(vla_dataset.dataset_statistics, run_dir)
-
-    # Create Train Strategy
-    overwatch.info(f"Initializing Train Strategy `{cfg.train_strategy}`")
-    
-    train_strategy = get_train_strategy(
-        train_strategy=cfg.train_strategy,
-        vlm=vlm,
-        device_id=device_id,
-        stage=stage,
-        epochs=cfg.epochs,
-        max_steps=cfg.max_steps,
-        global_batch_size=cfg.vla.global_batch_size,
-        per_device_batch_size=cfg.vla.per_device_batch_size,
-        learning_rate=cfg.learning_rate,
-        weight_decay=cfg.weight_decay,
-        max_grad_norm=cfg.max_grad_norm,
-        lr_scheduler_type=cfg.lr_scheduler_type,
-        warmup_ratio=cfg.warmup_ratio,
-        enable_gradient_checkpointing=cfg.vla.enable_gradient_checkpointing,
-        enable_mixed_precision_training=cfg.vla.enable_mixed_precision_training,
-        reduce_in_full_precision=cfg.vla.reduce_in_full_precision,
-        worker_init_fn=worker_init_fn,
-    )
-    train_strategy.run_setup(run_dir=run_dir, n_train_examples=len(vla_dataset))
-
-    # Create Metrics =>> Handles on the fly tracking, logging to specified trackers (e.g., JSONL, Weights & Biases)
-    overwatch.info(f"Creating Metrics with Active Trackers => `{cfg.trackers}`")
-    metrics = VLAMetrics(
-        cfg.trackers,
-        cfg.run_id,
-        run_dir,
-        draccus.encode(cfg),
-        wandb_project=cfg.wandb_project,
-        wandb_entity=cfg.wandb_entity,
-        resume_step=cfg.resume_step,
-        resume_epoch=cfg.resume_epoch,
-    )
-
-    # Run VLA Training
-    overwatch.info("Starting VLA Training Loop")
-    train_strategy.run_vla_training(
+    from torch.utils.data import DataLoader
+    dataloader = DataLoader(
         vla_dataset,
-        collator,
-        action_tokenizer,
-        metrics,
-        save_interval=cfg.save_interval,
+        batch_size=1,
+        sampler=None,
+        collate_fn=collator,
+        num_workers=0,
     )
 
-    # Finalize
-    overwatch.info("Done with Training =>> Finalizing Metrics")
-    metrics.finalize()
-
-    # And... we're done!
-    overwatch.info("... and that's all, folks!")
-    dist.barrier()
-    dist.destroy_process_group()
 
 
 if __name__ == "__main__":

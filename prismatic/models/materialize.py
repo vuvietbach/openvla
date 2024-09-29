@@ -72,6 +72,7 @@ LLM_BACKBONES = {
     "phi-2-3b": {"cls": PhiLLMBackbone, "kwargs": {}},
     
     # === Mamba Backbone ===
+    "mamba": {"cls": MambaLLMBackbone, "kwargs": {}},
     "mamba-codestral-7b": {"cls": MambaLLMBackbone, "kwargs": {}},
 }
 

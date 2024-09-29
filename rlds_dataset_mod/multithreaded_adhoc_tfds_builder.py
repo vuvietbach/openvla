@@ -146,6 +146,8 @@ class ParallelSplitBuilder(split_builder_lib.SplitBuilder):
     def __init__(
         self, *args, generator_fcn, n_workers, max_episodes_in_memory, **kwargs
     ):
+        if "file_format" in kwargs:
+            kwargs.pop("file_format")
         super().__init__(*args, **kwargs)
         self._generator_fcn = generator_fcn
         self._n_workers = n_workers

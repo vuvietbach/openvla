@@ -303,7 +303,7 @@ class PrismaticForConditionalGeneration(PrismaticPreTrainedModel):
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, PrismaticCausalLMOutputWithPast]:
         """Run a forward pass through the VLM, returning a PrismaticCausalLMOutputWithPast instance."""
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
